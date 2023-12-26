@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Página</title>
+</head>
+<body>
+<button id="startNFC">Iniciar Leitura NFC</button>
+<div id="tagInfo"></div>
+
+<script>
+
+function readTextRecord(record) {
+  console.assert(record.recordType === "text");
+  const textDecoder = new TextDecoder(record.encoding);
+  console.log(`Text: ${textDecoder.decode(record.data)} (${record.lang})`);
+}
+document.getElementById('startNFC').addEventListener('click', async () => {
+  try {
+    const reader = new NDEFReader();
+    await reader.scan();
+    
+    reader.onreading = event => {
+    const message = event.message;
+    for (const record of message.records) {
+    document.body.innerHTML += '<p>' + record.recordType + '</p>';
+    document.body.innerHTML += '<p>' + record.mediaType + '</p>';
+    document.body.innerHTML += '<p>' + record.id + '</p>';
+    if (record.recordType === "text") {
+        const textDecoder = new TextDecoder(record.encoding);
+        document.body.innerHTML += textDecoder.decode(record.data);
+    } else {
+        // O código dentro deste bloco será executado quando recordType não for "text".
+        console.log("Não é um registro de texto.");
+    }
+}
+      //document.body.innerHTML += '<p>' + tagData + '</p>';
+      reader.stop();
+    };
+  } catch (error) {
+    console.error('Erro ao iniciar a leitura NFC:', error);
+  }
+});
+</script>
+</body>
+</html>
