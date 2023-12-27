@@ -1,6 +1,4 @@
 <?php
-header('Content-Type: text/plain');
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $mensagem = $_POST['mensagem'] ?? '';
 
@@ -9,4 +7,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo 'Método de requisição inválido';
 }
-?>

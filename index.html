@@ -16,6 +16,24 @@ function readTextRecord(record) {
   const textDecoder = new TextDecoder(record.encoding);
   console.log(`Text: ${textDecoder.decode(record.data)} (${record.lang})`);
 }
+function enviarDados(mensagem) {
+    //const mensagem = 'Olá, servidor!';
+    fetch('processar.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        body: 'mensagem=' + encodeURIComponent(mensagem)
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('Resposta do servidor:', data);
+    })
+    .catch(error => {
+        console.error('Erro ao enviar requisição:', error);
+    });
+}
+
 document.getElementById('startNFC').addEventListener('click', async () => {
   try {
     const reader = new NDEFReader();
@@ -30,13 +48,14 @@ document.getElementById('startNFC').addEventListener('click', async () => {
     if (record.recordType === "text") {
         const textDecoder = new TextDecoder(record.encoding);
         document.body.innerHTML += textDecoder.decode(record.data);
+        enviarDados(textDecoder.decode(record.data));
     } else {
         // O código dentro deste bloco será executado quando recordType não for "text".
         console.log("Não é um registro de texto.");
     }
 }
       //document.body.innerHTML += '<p>' + tagData + '</p>';
-      reader.stop();
+      //reader.stop();
     };
   } catch (error) {
     console.error('Erro ao iniciar a leitura NFC:', error);
