@@ -36,7 +36,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Verificar se há linhas retornadas
         if ($result->num_rows > 0) {
-            echo "Código é igual à mensagem.";
+             $data = array();
+            echo "<table border='1'>";
+
+                while ($row = $result->fetch_assoc()) {
+                    $data[] = array(
+            'Nome_laboratorio' => $row['Nome_laboratorio'],
+            'item' => $row['item'],
+            'codigo' => $row['codigo']
+        );
+                }
+
+                echo "</table>";
         } else {
             echo "Código não é igual à mensagem.";
         }
@@ -52,7 +63,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 } else {
     echo 'Método de requisição inválido';
 }
+ // Converte o array para JSON
+    $json_data = json_encode($data);
 
+    // Imprime o JSON
+    echo $json_data;
 // Fechar a conexão com o banco de dados
 $conn->close();
 ?>
