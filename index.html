@@ -4,10 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Minha Página</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+    <style>
+    table {
+      border-collapse: collapse;
+      width: 50%;
+      margin: 20px;
+    }
+
+    th, td {
+      border: 1px solid #dddddd;
+      text-align: left;
+      padding: 8px;
+    }
+
+    th {
+      background-color: #f2f2f2;
+    }
+
+    tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+  </style>
 </head>
 <body>
 <button id="startNFC">Iniciar Leitura NFC</button>
 <div id="tagInfo"></div>
+<div id="tabela-container"></div>
+
+<script>
+function criarTabela(dadoTAG) {
+// Obtém a referência do contêiner onde a tabela será inserida
+  var tabelaContainer = document.getElementById("tabela-container");
+
+  // Cria a tabela
+  var tabela = document.createElement("table");
+
+  // Cria a linha de cabeçalho
+  var cabecalho = tabela.createTHead();
+  var cabecalhoLinha = cabecalho.insertRow();
+  var cabecalhoCelula1 = cabecalhoLinha.insertCell(0);
+  var cabecalhoCelula2 = cabecalhoLinha.insertCell(1);
+  var cabecalhoCelula3 = cabecalhoLinha.insertCell(2);
+  var cabecalhoCelula4 = cabecalhoLinha.insertCell(3);
+  var cabecalhoCelula5 = cabecalhoLinha.insertCell(4);
+  var cabecalhoCelula6 = cabecalhoLinha.insertCell(5);
+  cabecalhoCelula1.innerHTML = "ID";
+  cabecalhoCelula2.innerHTML = "Categoria";
+  cabecalhoCelula3.innerHTML = "Descrição";
+  cabecalhoCelula4.innerHTML = "Número de Série";
+  cabecalhoCelula5.innerHTML = "Posição";
+  cabecalhoCelula6.innerHTML = "LAB";
+
+  // Cria algumas linhas de exemplo
+  var corpo = tabela.createTBody();
+  for (var i = 1; i <= 1; i++) {
+    var linha = corpo.insertRow();
+    var celula1 = linha.insertCell(0);
+    var celula2 = linha.insertCell(1);
+    var celula3 = linha.insertCell(2);
+    var celula4 = linha.insertCell(3);
+    var celula5 = linha.insertCell(4);
+    var celula6 = linha.insertCell(5);
+    celula1.innerHTML = dadoTAG;
+    //celula2.innerHTML = "Linha " + i + ", Coluna 2";
+  }
+
+  // Adiciona a tabela ao contêiner
+  tabelaContainer.appendChild(tabela);
+}
+
+// Chama a função para criar a tabela
+//criarTabela(dadoTAG);
+</script>
 
 <script>
 
@@ -42,12 +112,13 @@ document.getElementById('startNFC').addEventListener('click', async () => {
     reader.onreading = event => {
     const message = event.message;
     for (const record of message.records) {
-    document.body.innerHTML += '<p>' + record.recordType + '</p>';
-    document.body.innerHTML += '<p>' + record.mediaType + '</p>';
-    document.body.innerHTML += '<p>' + record.id + '</p>';
+    //document.body.innerHTML += '<p>' + record.recordType + '</p>';
+    //document.body.innerHTML += '<p>' + record.mediaType + '</p>';
+    //document.body.innerHTML += '<p>' + record.id + '</p>';
     if (record.recordType === "text") {
         const textDecoder = new TextDecoder(record.encoding);
-        document.body.innerHTML += textDecoder.decode(record.data);
+        //document.body.innerHTML += textDecoder.decode(record.data);
+        criarTabela(textDecoder.decode(record.data));
         enviarDados(textDecoder.decode(record.data));
     } else {
         // O código dentro deste bloco será executado quando recordType não for "text".
