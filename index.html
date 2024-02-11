@@ -36,50 +36,51 @@
 <div id="tabela-container"></div>
 
 <script>
-function criarTabela(dadodescricao,dadocategoria, dadoTAG, dadoid,dadoposicao) {
-// Obtém a referência do contêiner onde a tabela será inserida
+function criarTabela(dadodescricao, dadocategoria, dadoTAG, dadoid, dadoposicao) {
+  // Obtém a referência do contêiner onde a tabela será inserida
   var tabelaContainer = document.getElementById("tabela-container");
 
-  // Cria a tabela
-  var tabela = document.createElement("table");
+  // Verifica se a tabela já foi criada
+  var tabela = tabelaContainer.querySelector("table");
 
-  // Cria a linha de cabeçalho
-  var cabecalho = tabela.createTHead();
-  var cabecalhoLinha = cabecalho.insertRow();
-  var cabecalhoCelula1 = cabecalhoLinha.insertCell(0);
-  var cabecalhoCelula2 = cabecalhoLinha.insertCell(1);
-  var cabecalhoCelula3 = cabecalhoLinha.insertCell(2);
-  var cabecalhoCelula4 = cabecalhoLinha.insertCell(3);
-  var cabecalhoCelula5 = cabecalhoLinha.insertCell(4);
-  
-  cabecalhoCelula1.innerHTML = "Descrição";
-  cabecalhoCelula2.innerHTML = "Categoria";
-  cabecalhoCelula3.innerHTML = "Número de Série";
-  cabecalhoCelula4.innerHTML = "ID";
-  cabecalhoCelula5.innerHTML = "Posição";
+  // Se a tabela ainda não existe, cria uma nova
+  if (!tabela) {
+    tabela = document.createElement("table");
 
-  // Cria algumas linhas de exemplo
-  var corpo = tabela.createTBody();
-  for (var i = 1; i <= 1; i++) {
-    var linha = corpo.insertRow();
-    var celula1 = linha.insertCell(0);
-    var celula2 = linha.insertCell(1);
-    var celula3 = linha.insertCell(2);
-    var celula4 = linha.insertCell(3);
-    var celula5 = linha.insertCell(4);
-    celula1.innerHTML = dadodescricao;
-    celula2.innerHTML = dadocategoria;
-    celula3.innerHTML = dadoTAG;
-    celula4.innerHTML = dadoid;
-    celula5.innerHTML = dadoposicao;
+    // Cria o cabeçalho da tabela
+    var cabecalho = tabela.createTHead();
+    var cabecalhoLinha = cabecalho.insertRow();
+    var cabecalhoCelula1 = cabecalhoLinha.insertCell(0);
+    var cabecalhoCelula2 = cabecalhoLinha.insertCell(1);
+    var cabecalhoCelula3 = cabecalhoLinha.insertCell(2);
+    var cabecalhoCelula4 = cabecalhoLinha.insertCell(3);
+    var cabecalhoCelula5 = cabecalhoLinha.insertCell(4);
+
+    cabecalhoCelula1.innerHTML = "Descrição";
+    cabecalhoCelula2.innerHTML = "Categoria";
+    cabecalhoCelula3.innerHTML = "Número de Série";
+    cabecalhoCelula4.innerHTML = "ID";
+    cabecalhoCelula5.innerHTML = "Posição";
+
+    // Adiciona a tabela ao contêiner
+    tabelaContainer.appendChild(tabela);
   }
 
-  // Adiciona a tabela ao contêiner
-  tabelaContainer.appendChild(tabela);
-}
+  // Adiciona uma nova linha ao corpo da tabela
+   var corpo = tabela.createTBody();
+   var linha = corpo.insertRow();
+   var celula1 = linha.insertCell(0);
+   var celula2 = linha.insertCell(1);
+   var celula3 = linha.insertCell(2);
+   var celula4 = linha.insertCell(3);
+   var celula5 = linha.insertCell(4);
 
-// Chama a função para criar a tabela
-//criarTabela(dadoTAG);
+   celula1.innerHTML = dadodescricao;
+   celula2.innerHTML = dadocategoria;
+   celula3.innerHTML = dadoTAG;
+   celula4.innerHTML = dadoid;
+   celula5.innerHTML = dadoposicao;
+}
 </script>
 
 <script>
@@ -95,18 +96,19 @@ const firebaseConfig = {
 
 // Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
+
 function receberDados(dadoTAG){
 
         // Referência para o nó no Realtime Database
         const database = firebase.database();
-        const caminhoParaSeuNo = dadoTAG; // Substitua com o seu caminho desejado
+        const caminhoNo = dadoTAG; 
 
         // Lendo os dados do nó
-        database.ref(caminhoParaSeuNo).once('value')
+        database.ref(caminhoNo).once('value')
             .then(snapshot => {
                 const dados = snapshot.val();
 
-                // Imprimir os dados por referência
+                // criação de uma tabela para os dados por referência
                 criarTabela(dados.descricao,dados.categoria, dadoTAG, dados.id,dados.posicao);
             })
             .catch(error => {
