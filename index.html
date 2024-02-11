@@ -29,12 +29,14 @@
   </style>
 </head>
 <body>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 <button id="startNFC">Iniciar Leitura NFC</button>
 <div id="tagInfo"></div>
 <div id="tabela-container"></div>
 
 <script>
-function criarTabela(dadoTAG) {
+function criarTabela(dadodescricao,dadocategoria, dadoTAG, dadoid,dadoposicao) {
 // Obtém a referência do contêiner onde a tabela será inserida
   var tabelaContainer = document.getElementById("tabela-container");
 
@@ -49,13 +51,12 @@ function criarTabela(dadoTAG) {
   var cabecalhoCelula3 = cabecalhoLinha.insertCell(2);
   var cabecalhoCelula4 = cabecalhoLinha.insertCell(3);
   var cabecalhoCelula5 = cabecalhoLinha.insertCell(4);
-  var cabecalhoCelula6 = cabecalhoLinha.insertCell(5);
-  cabecalhoCelula1.innerHTML = "ID";
+  
+  cabecalhoCelula1.innerHTML = "Descrição";
   cabecalhoCelula2.innerHTML = "Categoria";
-  cabecalhoCelula3.innerHTML = "Descrição";
-  cabecalhoCelula4.innerHTML = "Número de Série";
+  cabecalhoCelula3.innerHTML = "Número de Série";
+  cabecalhoCelula4.innerHTML = "ID";
   cabecalhoCelula5.innerHTML = "Posição";
-  cabecalhoCelula6.innerHTML = "LAB";
 
   // Cria algumas linhas de exemplo
   var corpo = tabela.createTBody();
@@ -66,9 +67,11 @@ function criarTabela(dadoTAG) {
     var celula3 = linha.insertCell(2);
     var celula4 = linha.insertCell(3);
     var celula5 = linha.insertCell(4);
-    var celula6 = linha.insertCell(5);
-    celula1.innerHTML = dadoTAG;
-    //celula2.innerHTML = "Linha " + i + ", Coluna 2";
+    celula1.innerHTML = dadodescricao;
+    celula2.innerHTML = dadocategoria;
+    celula3.innerHTML = dadoTAG;
+    celula4.innerHTML = dadoid;
+    celula5.innerHTML = dadoposicao;
   }
 
   // Adiciona a tabela ao contêiner
@@ -80,28 +83,36 @@ function criarTabela(dadoTAG) {
 </script>
 
 <script>
+const firebaseConfig = {
+  apiKey: "AIzaSyCXWV-KCtZAEsCRtyi7-cPkwpyMH6vjC68",
+  authDomain: "cadastro-de-equipamentos.firebaseapp.com",
+  databaseURL: "https://cadastro-de-equipamentos-default-rtdb.firebaseio.com",
+  projectId: "cadastro-de-equipamentos",
+  storageBucket: "cadastro-de-equipamentos.appspot.com",
+  messagingSenderId: "569414265680",
+  appId: "1:569414265680:web:b5c38cdc0a8b92cafd1a55"
+};
 
-function readTextRecord(record) {
-  console.assert(record.recordType === "text");
-  const textDecoder = new TextDecoder(record.encoding);
-  console.log(`Text: ${textDecoder.decode(record.data)} (${record.lang})`);
-}
-function enviarDados(mensagem) {
-    //const mensagem = 'Olá, servidor!';
-    fetch('processar.php', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded'
-        },
-        body: 'mensagem=' + encodeURIComponent(mensagem)
-    })
-    .then(response => response.text())
-    .then(data => {
-        console.log('Resposta do servidor:', data);
-    })
-    .catch(error => {
-        console.error('Erro ao enviar requisição:', error);
-    });
+// Inicializa o Firebase
+firebase.initializeApp(firebaseConfig);
+function receberDados(dadoTAG){
+
+        // Referência para o nó no Realtime Database
+        const database = firebase.database();
+        const caminhoParaSeuNo = dadoTAG; // Substitua com o seu caminho desejado
+
+        // Lendo os dados do nó
+        database.ref(caminhoParaSeuNo).once('value')
+            .then(snapshot => {
+                const dados = snapshot.val();
+
+                // Imprimir os dados por referência
+                criarTabela(dados.descricao,dados.categoria, dadoTAG, dados.id,dados.posicao);
+            })
+            .catch(error => {
+                console.error('Erro ao acessar dados do Firebase:', error);
+            });
+
 }
 
 document.getElementById('startNFC').addEventListener('click', async () => {
@@ -118,8 +129,8 @@ document.getElementById('startNFC').addEventListener('click', async () => {
     if (record.recordType === "text") {
         const textDecoder = new TextDecoder(record.encoding);
         //document.body.innerHTML += textDecoder.decode(record.data);
-        criarTabela(textDecoder.decode(record.data));
-        enviarDados(textDecoder.decode(record.data));
+        //criarTabela(textDecoder.decode(record.data));
+        receberDados(textDecoder.decode(record.data));
     } else {
         // O código dentro deste bloco será executado quando recordType não for "text".
         console.log("Não é um registro de texto.");
