@@ -112,36 +112,43 @@ function criarTabela(dadodescricao, dadocategoria, dadoTAG, dadoid, dadoposicao)
 
 <script>
 const firebaseConfig = {
-    apiKey: "AIzaSyCnZYCFzWTNsMx5CjYZm8mEHVgTmKmnjNo",
-    authDomain: "cadastro-equipamentos.firebaseapp.com",
-    projectId: "cadastro-equipamentos",
-    storageBucket: "cadastro-equipamentos.appspot.com",
-    messagingSenderId: "866090774424",
-    appId: "1:866090774424:web:563d84319de274ccf345ed"
-  };
+  apiKey: "AIzaSyCXWV-KCtZAEsCRtyi7-cPkwpyMH6vjC68",
+  authDomain: "cadastro-de-equipamentos.firebaseapp.com",
+  databaseURL: "https://cadastro-de-equipamentos-default-rtdb.firebaseio.com",
+  projectId: "cadastro-de-equipamentos",
+  storageBucket: "cadastro-de-equipamentos.appspot.com",
+  messagingSenderId: "569414265680",
+  appId: "1:569414265680:web:b5c38cdc0a8b92cafd1a55"
+};
 
 // Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
 
-function receberDados(dadoTAG){
+function receberDados(dadoTAG) {
+    // Referência para o nó no Realtime Database
+    const database = firebase.database();
 
-        // Referência para o nó no Realtime Database
-        const database = firebase.database();
-        const caminhoNo = dadoTAG; 
+    // Lendo os dados do nó com o nome fornecido em dadoTAG
+    database.ref("numSerie/" + dadoTAG).once('value')
+        .then(snapshot => {
+            const dados = snapshot.val();
 
-        // Lendo os dados do nó
-        database.ref(caminhoNo).once('value')
-            .then(snapshot => {
-                const dados = snapshot.val();
-
-                // criação de uma tabela para os dados por referência
-                criarTabela(dados.descricao,dados.categoria, dadoTAG, dados.id,dados.posicao);
-            })
-            .catch(error => {
-                console.error('Erro ao acessar dados do Firebase:', error);
-            });
-
+            // Verifica se os dados existem
+            if (dados != null) {
+                // Passando as informações para a função criarTabela()
+                criarTabela(dados.descricao, dados.categoria, dadoTAG, dados.id, dados.posicao);
+            } else {
+                console.error('Nenhum dado encontrado para a tag fornecida:', dadoTAG);
+            }
+        })
+        .catch(error => {
+            console.error('Erro ao acessar dados do Firebase:', error);
+        });
 }
+
+
+
+
 
 document.getElementById('startNFC').addEventListener('click', async () => {
   try {
