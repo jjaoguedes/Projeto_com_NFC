@@ -3,181 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minha Página</title>
-    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
-    <style>
-    table {
-            border-collapse: collapse;
-            width: 80%;
-            margin: 20px auto; /* Centralizar a tabela */
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Adicionar sombra à tabela */
-        }
-
-        th, td {
-            border: 1px solid #dddddd;
-            text-align: left;
-            padding: 12px;
-        }
-
-        th {
-            background-color: #3498db; /* Cor de fundo azul para cabeçalho */
-            color: #fff; /* Texto branco no cabeçalho */
-        }
-
-        tr:nth-child(even) {
-            background-color: #f5f5f5; /* Cor de fundo para linhas pares */
-        }
-
-        tr:hover {
-            background-color: #ecf0f1; /* Cor de fundo ao passar o mouse sobre a linha */
-        }
-    /* Estilos para o botão */
-        #startNFC {
-            display: inline-block;
-            padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
-            text-align: center;
-            text-decoration: none;
-            background-color: #3498db; /* Cor azul */
-            color: #fff;
-            border: 2px solid #3498db; /* Cor da borda azul correspondente */
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        /* Estilos para a animação de hover */
-        #startNFC:hover {
-            background-color: #2980b9; /* Cor de hover azul mais escura */
-            color: #fff;
-        }
-  </style>
+    <title>Home</title>
 </head>
 <body>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+
 <button id="startNFC">Iniciar Verificação</button>
 <div id="tagInfo"></div>
 <div id="tabela-container"></div>
+<link rel="stylesheet" href="style.css">
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+<script src="js/firebaseconfig.js"></script>
+<script src="js/verificacaoNFC.js"></script>
+<link rel="stylesheet" href="css/style.css">
+<script src="js/index.js"></script>
 
-<script>
-function criarTabela(dadodescricao, dadocategoria, dadoTAG, dadoid, dadoposicao) {
-  // Obtém a referência do contêiner onde a tabela será inserida
-  var tabelaContainer = document.getElementById("tabela-container");
-
-  // Verifica se a tabela já foi criada
-  var tabela = tabelaContainer.querySelector("table");
-
-  // Se a tabela ainda não existe, cria uma nova
-  if (!tabela) {
-    tabela = document.createElement("table");
-
-    // Cria o cabeçalho da tabela
-    var cabecalho = tabela.createTHead();
-    var cabecalhoLinha = cabecalho.insertRow();
-    var cabecalhoCelula1 = cabecalhoLinha.insertCell(0);
-    var cabecalhoCelula2 = cabecalhoLinha.insertCell(1);
-    var cabecalhoCelula3 = cabecalhoLinha.insertCell(2);
-    var cabecalhoCelula4 = cabecalhoLinha.insertCell(3);
-    var cabecalhoCelula5 = cabecalhoLinha.insertCell(4);
-
-    cabecalhoCelula1.innerHTML = "Descrição";
-    cabecalhoCelula2.innerHTML = "Categoria";
-    cabecalhoCelula3.innerHTML = "Número de Série";
-    cabecalhoCelula4.innerHTML = "ID";
-    cabecalhoCelula5.innerHTML = "Posição";
-
-    // Adiciona a tabela ao contêiner
-    tabelaContainer.appendChild(tabela);
-  }
-
-  // Adiciona uma nova linha ao corpo da tabela
-   var corpo = tabela.createTBody();
-   var linha = corpo.insertRow();
-   var celula1 = linha.insertCell(0);
-   var celula2 = linha.insertCell(1);
-   var celula3 = linha.insertCell(2);
-   var celula4 = linha.insertCell(3);
-   var celula5 = linha.insertCell(4);
-
-   celula1.innerHTML = dadodescricao;
-   celula2.innerHTML = dadocategoria;
-   celula3.innerHTML = dadoTAG;
-   celula4.innerHTML = dadoid;
-   celula5.innerHTML = dadoposicao;
-}
-</script>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCnZYCFzWTNsMx5CjYZm8mEHVgTmKmnjNo",
-  authDomain: "cadastro-equipamentos.firebaseapp.com",
-  databaseURL: "https://cadastro-equipamentos-default-rtdb.firebaseio.com",
-  projectId: "cadastro-equipamentos",
-  storageBucket: "cadastro-equipamentos.appspot.com",
-  messagingSenderId: "866090774424",
-  appId: "1:866090774424:web:563d84319de274ccf345ed"
-};
-
-// Inicializa o Firebase
-firebase.initializeApp(firebaseConfig);
-
-function receberDados(dadoTAG) {
-    // Referência para o nó no Realtime Database
-    const database = firebase.database();
-
-    // Lendo os dados do nó com o nome fornecido em dadoTAG
-    database.ref("numSerie/" + dadoTAG).once('value')
-        .then(snapshot => {
-            const dados = snapshot.val();
-
-            // Verifica se os dados existem
-            if (dados != null) {
-                // Passando as informações para a função criarTabela()
-                criarTabela(dados.descricao, dados.categoria, dadoTAG, dados.id, dados.posicao);
-            } else {
-                console.error('Nenhum dado encontrado para a tag fornecida:', dadoTAG);
-            }
-        })
-        .catch(error => {
-            console.error('Erro ao acessar dados do Firebase:', error);
-        });
-}
-
-
-
-
-
-document.getElementById('startNFC').addEventListener('click', async () => {
-  try {
-    const reader = new NDEFReader();
-    await reader.scan();
-    
-    reader.onreading = event => {
-    const message = event.message;
-    for (const record of message.records) {
-    //document.body.innerHTML += '<p>' + record.recordType + '</p>';
-    //document.body.innerHTML += '<p>' + record.mediaType + '</p>';
-    //document.body.innerHTML += '<p>' + record.id + '</p>';
-    if (record.recordType === "text") {
-        const textDecoder = new TextDecoder(record.encoding);
-        //document.body.innerHTML += textDecoder.decode(record.data);
-        //criarTabela(textDecoder.decode(record.data));
-        receberDados(textDecoder.decode(record.data));
-    } else {
-        // O código dentro deste bloco será executado quando recordType não for "text".
-        console.log("Não é um registro de texto.");
-    }
-}
-      //document.body.innerHTML += '<p>' + tagData + '</p>';
-      //reader.stop();
-    };
-  } catch (error) {
-    console.error('Erro ao iniciar a leitura NFC:', error);
-  }
-});
-</script>
 </body>
 </html>
